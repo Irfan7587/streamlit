@@ -15,8 +15,10 @@ import os
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Define the relative path to the directory where you want to store the file
-data_dir = 'data'
+DATA_PATH = os.path.join(script_dir, 'data')
+os.makedirs(DATA_PATH)
 DB_FAISS_PATH = os.path.join(script_dir, 'VectorStore')
+os.makedirs(DB_FAISS_PATH)
 
 #Deleting a file from DATA_PATH
 def safe_delete_file(file_path):
@@ -29,7 +31,7 @@ def safe_delete_file(file_path):
 
 # Adjust the text splitter to create smaller chunks
 def create_vector_db(uploaded_file):
-    temp_path = os.path.join(script_dir, data_dir, uploaded_file.name)
+    temp_path = os.path.join(DATA_PATH, uploaded_file.name)
     with open(temp_path, 'wb') as f:
         f.write(uploaded_file.getbuffer())
     
