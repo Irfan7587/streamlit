@@ -11,14 +11,20 @@ from sentence_transformers import SentenceTransformer
 import os
 
 
+#Create required dirs
+def create_dirs(file_path):
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+        print(f"Created directory {file_path}")
+
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Define the relative path to the directory where you want to store the file
-DATA_PATH = os.path.join(script_dir, 'data')
-os.makedirs(DATA_PATH)
+# Defining the relative path to the directory where we want to store the file
+DATA_PATH = os.path.join(script_dir, 'data/')
+create_dirs(DATA_PATH)
 DB_FAISS_PATH = os.path.join(script_dir, 'VectorStore/')
-os.makedirs(DB_FAISS_PATH)
+create_dirs(DB_FAISS_PATH)
 
 #Deleting a file from DATA_PATH
 def safe_delete_file(file_path):
@@ -29,17 +35,16 @@ def safe_delete_file(file_path):
     else:
         print(f"File {file_path} does not exist")
 
-# Adjust the text splitter to create smaller chunks
 def create_vector_db(uploaded_file):
     temp_path = os.path.join(DATA_PATH, uploaded_file.name)
     with open(temp_path, 'wb') as f:
         f.write(uploaded_file.getbuffer())
     
-    # Now, assume you need a file path to load the document
+    # Now, loading the pdf document
     loader = PyPDFLoader(file_path=temp_path)
     documents = loader.load() 
 
-    # Continue with the processing
+    # Further processing
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50)
     texts = text_splitter.split_documents(documents)
     if not texts:
@@ -47,7 +52,7 @@ def create_vector_db(uploaded_file):
     
     embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device': 'cpu'})
     db = FAISS.from_documents(texts, embeddings)
-    db.save_local(DB_FAISS_PATH)  
+    db.save_local(DB_FAISS_PATH)    
 
     # After successful embedding and saving, delete the PDF file
     safe_delete_file(temp_path)
@@ -92,10 +97,10 @@ def set_custom_prompt():
 
     Answer the question based on the provided context and information from the documents.
 
-    Helpful answer:
     """
     prompt = PromptTemplate(template=custom_prompt_template, input_variables=['context', 'question'])
     return prompt
+
 
 def generate_query_embedding(query, model_name):
     # Initialize the model
