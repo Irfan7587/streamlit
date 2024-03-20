@@ -17,7 +17,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Define the relative path to the directory where you want to store the file
 DATA_PATH = os.path.join(script_dir, 'data')
 os.makedirs(DATA_PATH)
-DB_FAISS_PATH = os.path.join(script_dir, 'VectorStore')
+DB_FAISS_PATH = os.path.join(script_dir, 'VectorStore/')
 os.makedirs(DB_FAISS_PATH)
 
 #Deleting a file from DATA_PATH
