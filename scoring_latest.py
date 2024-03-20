@@ -11,8 +11,12 @@ from sentence_transformers import SentenceTransformer
 import os
 
 
-DATA_PATH = 'data/'
-DB_FAISS_PATH = 'VectorStore/'
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define the relative path to the directory where you want to store the file
+data_dir = 'data'
+DB_FAISS_PATH = os.path.join(script_dir, 'VectorStore')
 
 #Deleting a file from DATA_PATH
 def safe_delete_file(file_path):
@@ -25,7 +29,7 @@ def safe_delete_file(file_path):
 
 # Adjust the text splitter to create smaller chunks
 def create_vector_db(uploaded_file):
-    temp_path = os.path.join(DATA_PATH, uploaded_file.name)
+    temp_path = os.path.join(script_dir, data_dir, uploaded_file.name)
     with open(temp_path, 'wb') as f:
         f.write(uploaded_file.getbuffer())
     
@@ -90,16 +94,6 @@ def set_custom_prompt():
     """
     prompt = PromptTemplate(template=custom_prompt_template, input_variables=['context', 'question'])
     return prompt
-
-def qa_bot():
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2",
-                                       model_kwargs={'device': 'cpu'})
-    db = FAISS.load_local(DB_FAISS_PATH, embeddings)
-    llm = load_llm()
-    qa_prompt = set_custom_prompt()
-    qa = retrieval_qa_chain(llm, qa_prompt, db)
-    return qa
-
 
 def generate_query_embedding(query, model_name):
     # Initialize the model
